@@ -13,7 +13,9 @@ var client;
 var keypair;
 
 // SIP6
-const {Environment} = require('storj');
+const {
+  Environment
+} = require('storj');
 var storj;
 
 function isEmpty(obj) {
@@ -54,20 +56,20 @@ module.exports = {
 
     storj.getBuckets(function(err, result) {
       if (err) {
-        return cb ({
+        return cb({
           status: 'fail',
           message: err.message
         });
       }
 
-      if(isEmpty(result)) {
-        return cb ({
+      if (isEmpty(result)) {
+        return cb({
           status: 'empty',
           message: 'No vaults found.'
         });
       }
 
-      return cb ({
+      return cb({
         status: 'success',
         result: result
       });
@@ -89,57 +91,57 @@ module.exports = {
           message: err.message
         });
       }
-      return cb ({
+      return cb({
         status: 'success',
         result: result
       });
     });
   },
   deleteVault: function(req, res, vaultName, cb) {
-      storj = new Environment({
-        bridgeUrl: DIGIPULSE_HUB,
-        bridgeUser: req.session.email,
-        bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
-        encryptionKey: 'test1',
-        logLevel: 4
-      });
+    storj = new Environment({
+      bridgeUrl: DIGIPULSE_HUB,
+      bridgeUser: req.session.email,
+      bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+      encryptionKey: 'test1',
+      logLevel: 4
+    });
 
-      storj.deleteBucket(vaultName, function(err, result) {
-        if (err) {
-          return cb({
-            status: 'fail',
-            message: err.message
-          });
-        }
-        return cb ({
-          status: 'success',
-          result: result
-        });
-      });
-    },
-  listFiles: function(req, res, vaultID, cb) {
-      storj = new Environment({
-        bridgeUrl: DIGIPULSE_HUB,
-        bridgeUser: req.session.email,
-        bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
-        encryptionKey: 'test1',
-        logLevel: 4
-      });
-
-      storj.listFiles(vaultID, function(err, result) {
-        if (err) {
-          return cb({
-            status: 'fail',
-            message: err.message
-          });
-        }
+    storj.deleteBucket(vaultName, function(err, result) {
+      if (err) {
         return cb({
-          status: 'success',
-          result: result
+          status: 'fail',
+          message: err.message
         });
-        //storj.destroy();
+      }
+      return cb({
+        status: 'success',
+        result: result
       });
-    },
+    });
+  },
+  listFiles: function(req, res, vaultID, cb) {
+    storj = new Environment({
+      bridgeUrl: DIGIPULSE_HUB,
+      bridgeUser: req.session.email,
+      bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+      encryptionKey: 'test1',
+      logLevel: 4
+    });
+
+    storj.listFiles(vaultID, function(err, result) {
+      if (err) {
+        return cb({
+          status: 'fail',
+          message: err.message
+        });
+      }
+      return cb({
+        status: 'success',
+        result: result
+      });
+      //storj.destroy();
+    });
+  },
   storeFile: function(req, res, vaultID, cb) {
     var bucketId = req.body.driveID;
     var files = req.files;
@@ -169,11 +171,17 @@ module.exports = {
           },
           finishedCallback: function(err, fileId) {
             if (err) {
-              return res.send({status: 'fail',message: err.message});
+              return res.send({
+                status: 'fail',
+                message: err.message
+              });
             }
             // Remove file stored on system
-            fs.removeSync(file.destination );
-            return res.send({status: 'success',result: fileId});
+            fs.removeSync(file.destination);
+            return res.send({
+              status: 'success',
+              result: fileId
+            });
           }
         });
       });
@@ -183,9 +191,9 @@ module.exports = {
     var randomFolder = DGPCRYPTO.genRandomString(24);
     var tmpPath = DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder;
     console.log(tmpPath);
-    if (!fs.existsSync(tmpPath)){
-          fs.mkdirSync(tmpPath);
-      }
+    if (!fs.existsSync(tmpPath)) {
+      fs.mkdirSync(tmpPath);
+    }
 
     var bucketId = req.body.driveID;
     var fileId = req.body.fileID;
@@ -206,16 +214,23 @@ module.exports = {
     storj.resolveFile(bucketId, fileId, downloadFilePath, {
       progressCallback: function(progress, downloadedBytes, totalBytes) {
         console.log('Progress: %d, downloadedBytes: %d, totalBytes: %d',
-                    progress, downloadedBytes, totalBytes);
+          progress, downloadedBytes, totalBytes);
       },
       finishedCallback: function(err) {
         if (err) {
-          return res.send({ status: 'fail', message: err.message });
+          return res.send({
+            status: 'fail',
+            message: err.message
+          });
         }
 
         //res.download(downloadFilePath);
         //fsextra.removeSync(tmpPath);
-        return res.send({ status: 'success', message: 'download complete', tmp:randomFolder  });
+        return res.send({
+          status: 'success',
+          message: 'download complete',
+          tmp: randomFolder
+        });
 
         //return res.send({ result: 'fileId' });
         //storj.destroy();
@@ -242,12 +257,10 @@ module.exports = {
           message: err.message
         });
       }
-      return cb ({
+      return cb({
         status: 'success',
         result: result
       });
     });
   }
-
-
 }

@@ -14,72 +14,39 @@ $('#vaultTable').on('click', '.btn-trash', function() {
   deleteVault(tempDrive);
 });
 
-$('#fileTable').on( 'click', 'button.download', function () {
+$('#fileTable').on('click', 'button.download', function() {
   downloadFile($(this).attr('data-drive'), $(this).attr('data-filename'), $(this).attr('data-id'), $(this).attr('data-mime'));
 });
 
-function downloadFile(containerID, filename, fileID, fileMime) {
-
-  var data = {};
-  data.driveID = containerID;
-  data.fileID = fileID;
-  data.fileNAME = filename;
-  data.MIME = fileMime;
-
-  console.log(data);
-
-  $.ajax({
-    method: 'POST',
-    /* /list/:id/download/:name/:fileid/mime/:mime */
-    url: '/vault/download/file',
-    data: JSON.stringify(data),
-    contentType:  'application/json',
-    processData: false
-  }).done(function(response) {
-
-    if (response.status === 'fail') {
-      // Error handling
-      console.error(response.message, 'Error occured!')
-    }
-    if (response.status === 'success') {
-      // Error handling
-      console.log(response.message, 'Success!');
-      //window.location = '/dev/download/' + response.tmp + '/' + filename ;
-
-    }
-  })
-}
-
-$('#upload-input').on('change', function(){
+$('#upload-input').on('change', function() {
   var files = $(this).get(0).files;
   var drive = $(this).closest('tr').children('.driveid').text();
   $('#driveID').val(tempDrive);
 
   var files = $(this).get(0).files;
   if (files.length > 0) {
-      var formData = new FormData();
+    var formData = new FormData();
 
-      for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          //formData.append('pictures', file, file.name);
-          formData.append('uploads', file, file.name);
-          formData.append('driveID', tempDrive);
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      //formData.append('pictures', file, file.name);
+      formData.append('uploads', file, file.name);
+      formData.append('driveID', tempDrive);
+    }
+
+    $.ajax({
+      url: '/vault/upload',
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(links) {
+        location.reload();
       }
-
-      $.ajax({
-          url          : '/vault/upload',
-          type         : 'POST',
-          data         : formData,
-          processData  : false,
-          contentType  : false,
-          success      : function (links) {
-            location.reload();
-          }
-      });
+    });
   }
 
 });
-
 
 listDrives();
 
@@ -160,6 +127,37 @@ function listFiles(driveID) {
   })
 }
 
+function downloadFile(containerID, filename, fileID, fileMime) {
+
+  var data = {};
+  data.driveID = containerID;
+  data.fileID = fileID;
+  data.fileNAME = filename;
+  data.MIME = fileMime;
+
+  console.log(data);
+
+  $.ajax({
+    method: 'POST',
+    /* /list/:id/download/:name/:fileid/mime/:mime */
+    url: '/vault/file/download',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    processData: false
+  }).done(function(response) {
+
+    if (response.status === 'fail') {
+      // Error handling
+      console.error(response.message, 'Error occured!')
+    }
+    if (response.status === 'success') {
+      // Error handling
+      console.log(response.message, 'Success!');
+      //window.location = '/dev/download/' + response.tmp + '/' + filename ;
+
+    }
+  })
+}
 
 function deleteFile(elem) {
   var data = {};
