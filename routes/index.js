@@ -1,25 +1,21 @@
+/********************************************************************************
+ *                         DigiPulse Minimum Viable Backend                     *
+ *      Minimum viable backend for the DigiPulse network by Steve Walschot      *
+ *******************************************************************************/
+
 var express = require('express');
 var fs = require('fs-extra');
 var router = express.Router();
 
-/********************************************************************************
- *                                  AUTH SECTION                                *
- *                                                                              *
- *                        @dev Uses the DGP_AUTH.js module                      *
- ********************************************************************************
- /* Info only, these calls need binding.
-Nan::SetPrototypeMethod(constructor, "getInfo", GetInfo);
-
-Nan::SetPrototypeMethod(constructor, "storeFileCancel", StoreFileCancel);
-Nan::SetPrototypeMethod(constructor, "resolveFileCancel", ResolveFileCancel);
-Nan::SetPrototypeMethod(constructor, "deleteFile", DeleteFile);
-
-*/
-
-
+/* Include our modules */
 var DGPAUTH = require("../DGP_MODULES/DGP_AUTH.js");
 var DGPCONFIG = require("../DGP_MODULES/DGP_CONFIG.js");
 var DGPCRYPTO = require("../DGP_MODULES/DGP_CRYPTO.js");
+var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
+
+/********************************************************************************
+ *                                  MULTER                                      *
+ *******************************************************************************/
 
 var multer = require('multer');
 
@@ -41,9 +37,11 @@ var upload = multer({
 });
 
 
-
-
-
+/********************************************************************************
+ *                                  AUTH SECTION                                *
+ *                                                                              *
+ *                        @dev Uses the DGP_AUTH.js module                      *
+ *******************************************************************************/
 
 router.get('/login/:user/:pass', function(req, res, next) {
   var user = {email: req.params.user,password: req.params.pass};
@@ -59,13 +57,13 @@ router.get('/logout', function(req, res, next) {
   });
 });
 
+
+
 /********************************************************************************
  *                                  FILE SECTION                                *
  *                                                                              *
  *                        @dev Uses the DGP_FILE.js module                      *
  *******************************************************************************/
-
-var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
 
  router.get('/vault', function(req, res, next) {
    DGPFILE.listVault(req,res, function(result){
@@ -91,14 +89,13 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    });
  });
 
-
  router.post('/vault/upload', upload.any(), function(req, res, next) {
    DGPFILE.storeFile(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
  });
- 
- router.post('/vault/download/file', function(req, res, next) {
+
+ router.post('/vault/file/download', function(req, res, next) {
    console.log("requested: " + req.body.driveID);
    DGPFILE.resolveFile(req,res, req.body.vaultID, function(result){
      return res.json(result);
