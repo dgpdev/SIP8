@@ -47,6 +47,10 @@
         </table>
       </div>
     </div>
+    <form id="uploadForm" style="display:none" ref="uploadForm" action="dev/upload" method="post" encType="multipart/form-data">
+      <input id="upload-input" type="file" name="upl">
+      <input id="driveID" type="hidden" name="driveID" value="">
+    </form>
   </div>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -56,6 +60,18 @@
 
     $('#vaultTable').on( 'click', '.btn-getdrive', function () {
       listFiles($(this).attr('data-drive'));
+    });
+
+    $('#vaultTable').on( 'click', '.btn-up', function (el) {
+      tempDrive = $(el.target).data('drive');
+      $('#driveID').val(tempDrive);
+      $('#upload-input').click();
+    });
+
+    $('#vaultTable').on( 'click', '.btn-trash', function () {
+      tempDrive = $(this).closest('tr').children('.driveid').text();
+      console.log("Deleting drive: " + tempDrive );
+      deleteVault(tempDrive);
     });
 
     listDrives();
@@ -89,7 +105,6 @@
         }
       })
     }
-
     function listFiles(driveID) {
       var data = {};
       var fileSize = 0;
@@ -129,6 +144,30 @@
             fileSize += file.size;
           });
           table.append("</tbody>");
+        }
+      })
+    }
+    function deleteVault(vaultID) {
+      var data = {};
+      data.vaultID = vaultID;
+
+      $.ajax({
+        method: 'POST',
+        url: '/vault/delete',
+        data: JSON.stringify(data),
+        contentType:  'application/json',
+        processData: false
+      }).done(function(response) {
+
+        if (response.status === 'fail') {
+          // Error handling
+          console.error(response.message, 'Error occured!')
+        }
+        if (response.status === 'success') {
+          // Error handling
+          console.log(response.message, 'Success!');
+          location.reload();
+
         }
       })
     }

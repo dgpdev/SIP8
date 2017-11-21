@@ -59,14 +59,13 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    });
  });
 
- router.get('/vault/delete/:name', function(req, res, next) {
-   DGPFILE.deleteVault(req,res, req.params.name, function(result){
+ router.post('/vault/delete/', function(req, res, next) {
+   DGPFILE.deleteVault(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
  });
 
  router.post('/vault/list', function(req, res, next) {
-   console.log('param' + req.body.vaultID);
    DGPFILE.listFiles(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
