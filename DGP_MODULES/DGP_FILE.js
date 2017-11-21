@@ -53,8 +53,46 @@ addVault: function(req, res, vaultName, cb) {
         return cb(err);
       }
       return cb({result: result});
-      storj.destroy();
     });
-  }
+  },
+deleteVault: function(req, res, vaultName, cb) {
+      storj = new Environment({
+        bridgeUrl: DIGIPULSE_HUB,
+        bridgeUser: req.session.email,
+        bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+        encryptionKey: 'test1',
+        logLevel: 4
+      });
+
+      storj.deleteBucket(vaultName, function(err, result) {
+        if (err) {
+          return cb(err);
+        }
+        return cb({result: result});
+      });
+    },
+listFiles: function(req, res, vaultID, cb) {
+      storj = new Environment({
+        bridgeUrl: DIGIPULSE_HUB,
+        bridgeUser: req.session.email,
+        bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+        encryptionKey: 'test1',
+        logLevel: 4
+      });
+
+      storj.listFiles(vaultID, function(err, result) {
+        if (err) {
+          return cb({
+            status: 'fail',
+            message: err.message
+          });
+        }
+        return cb({
+          status: 'success',
+          result: result
+        });
+        //storj.destroy();
+      });
+    }
 
 }
