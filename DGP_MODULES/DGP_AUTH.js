@@ -72,5 +72,14 @@ module.exports = {
         });
       });
     });
+  },
+  logout: function(req, res, cb) {
+    req.session.destroy(function(err) {
+      return cb({
+        status: 'success',
+        message: 'Logged out'
+      });
+    });
   }
+
 }
