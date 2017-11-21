@@ -50,9 +50,15 @@ addVault: function(req, res, vaultName, cb) {
 
     storj.createBucket(vaultName, function(err, result) {
       if (err) {
-        return cb(err);
+        return cb({
+          status: 'fail',
+          message: err.message
+        });
       }
-      return cb({result: result});
+      return cb ({
+        status: 'success',
+        result: result
+      });
     });
   },
 deleteVault: function(req, res, vaultName, cb) {
@@ -66,9 +72,15 @@ deleteVault: function(req, res, vaultName, cb) {
 
       storj.deleteBucket(vaultName, function(err, result) {
         if (err) {
-          return cb(err);
+          return cb({
+            status: 'fail',
+            message: err.message
+          });
         }
-        return cb({status: 'success', result: result});
+        return cb ({
+          status: 'success',
+          result: result
+        });
       });
     },
 listFiles: function(req, res, vaultID, cb) {
