@@ -53,7 +53,7 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    });
  });
 
- router.get('/vault/create/:name', function(req, res, next) {
+ router.post('/vault/create', function(req, res, next) {
    DGPFILE.addVault(req,res, req.params.name, function(result){
      return res.json(result);
    });
