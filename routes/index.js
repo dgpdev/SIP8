@@ -1,4 +1,5 @@
 var express = require('express');
+var fs = require('fs-extra');
 var router = express.Router();
 
 /********************************************************************************
@@ -19,8 +20,30 @@ Nan::SetPrototypeMethod(constructor, "destroy", DestroyEnvironment);
 */
 
 
-
 var DGPAUTH = require("../DGP_MODULES/DGP_AUTH.js");
+var DGPCONFIG = require("../DGP_MODULES/DGP_CONFIG.js");
+var DGPCRYPTO = require("../DGP_MODULES/DGP_CRYPTO.js");
+
+var multer = require('multer');
+
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    var randomFolder = DGPCRYPTO.genRandomString(24);
+    var tmpPath = DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder;
+    fs.mkdirsSync(tmpPath)
+    cb(null, tmpPath)
+  },
+  filename: function(req, file, callback) {
+    console.log(file)
+    callback(null, file.originalname)
+  }
+});
+
+var upload = multer({
+  storage: storage
+});
+
+
 
 
 
@@ -76,6 +99,15 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    DGPAUTH.logout(req,res, function(result){
      return res.json(result);
    });
+ });
+
+ router.post('/vault/upload', upload.any(), function(req, res, next) {
+   console.log(req.files);
+
+   DGPFILE.storeFile(req,res, req.body.vaultID, function(result){
+     return res.json(result);
+   });
+
  });
 
 

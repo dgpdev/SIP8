@@ -1,4 +1,7 @@
 var session = require('express-session');
+// NPM INSTALL NODE-FS-EXTRA
+var fs = require('fs-extra');
+
 var DGPCRYPTO = require("../DGP_MODULES/DGP_CRYPTO.js");
 var DGPCONFIG = require("../DGP_MODULES/DGP_CONFIG.js");
 
@@ -16,6 +19,27 @@ var storj;
 function isEmpty(obj) {
   return !Object.keys(obj).length > 0;
 }
+
+var multer = require('multer');
+
+const tmpDir = '/temp';
+
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    var randomFolder = DGPCRYPTO.genRandomString(24);
+    var tmpPath = DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder;
+    fs.mkdirsSync(tmpPath)
+    cb(null, tmpPath)
+  },
+  filename: function(req, file, callback) {
+    console.log(file)
+    callback(null, file.originalname)
+  }
+});
+
+var upload = multer({
+  storage: storage
+});
 
 module.exports = {
   listVault: function(req, res, cb) {
@@ -49,7 +73,7 @@ module.exports = {
       });
     });
   },
-addVault: function(req, res, vaultName, cb) {
+  addVault: function(req, res, vaultName, cb) {
     storj = new Environment({
       bridgeUrl: DIGIPULSE_HUB,
       bridgeUser: req.session.email,
@@ -71,7 +95,7 @@ addVault: function(req, res, vaultName, cb) {
       });
     });
   },
-deleteVault: function(req, res, vaultName, cb) {
+  deleteVault: function(req, res, vaultName, cb) {
       storj = new Environment({
         bridgeUrl: DIGIPULSE_HUB,
         bridgeUser: req.session.email,
@@ -93,7 +117,7 @@ deleteVault: function(req, res, vaultName, cb) {
         });
       });
     },
-listFiles: function(req, res, vaultID, cb) {
+  listFiles: function(req, res, vaultID, cb) {
       storj = new Environment({
         bridgeUrl: DIGIPULSE_HUB,
         bridgeUser: req.session.email,
@@ -115,6 +139,45 @@ listFiles: function(req, res, vaultID, cb) {
         });
         //storj.destroy();
       });
+    },
+  storeFile: function(req, res, vaultID, cb) {
+    var bucketId = req.body.driveID;
+    var files = req.files;
+
+    if (files) {
+      files.forEach(function(file) {
+        console.log('-----------------------------------------');
+        console.log(file);
+        console.log('-----------------------------------------');
+
+        var uploadFilePath = file.path;
+        var fileName = file.filename;
+
+        storj = new Environment({
+          bridgeUrl: DIGIPULSE_HUB,
+          bridgeUser: req.session.email,
+          bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+          encryptionKey: 'test1',
+          logLevel: 4
+        });
+
+        storj.storeFile(bucketId, uploadFilePath, {
+          filename: fileName,
+          progressCallback: function(progress, uploadedBytes, totalBytes) {
+            console.log('Progress: %d, uploadedBytes: %d, totalBytes: %d',
+              progress, uploadedBytes, totalBytes);
+          },
+          finishedCallback: function(err, fileId) {
+            if (err) {
+              return res.send({status: 'fail',message: err.message});
+            }
+            // Remove file stored on system
+            fs.removeSync(file.destination );
+            return res.send({status: 'success',result: fileId});
+          }
+        });
+      });
     }
+  }
 
 }

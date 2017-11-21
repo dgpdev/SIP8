@@ -18,6 +18,7 @@
     "forever": "^0.15.3",
     "is-empty": "1.2.0",
     "storj": "github:storj/node-libstorj",
-    "storj-lib": "6.7.0"
+    "storj-lib": "6.7.0",
+    "fs-extra": "4.0.2"
   }
 }
