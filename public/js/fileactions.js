@@ -14,6 +14,42 @@ $('#vaultTable').on('click', '.btn-trash', function() {
   deleteVault(tempDrive);
 });
 
+$('#fileTable').on( 'click', 'button.download', function () {
+  downloadFile($(this).attr('data-drive'), $(this).attr('data-filename'), $(this).attr('data-id'), $(this).attr('data-mime'));
+});
+
+function downloadFile(containerID, filename, fileID, fileMime) {
+
+  var data = {};
+  data.driveID = containerID;
+  data.fileID = fileID;
+  data.fileNAME = filename;
+  data.MIME = fileMime;
+
+  console.log(data);
+
+  $.ajax({
+    method: 'POST',
+    /* /list/:id/download/:name/:fileid/mime/:mime */
+    url: '/vault/download/file',
+    data: JSON.stringify(data),
+    contentType:  'application/json',
+    processData: false
+  }).done(function(response) {
+
+    if (response.status === 'fail') {
+      // Error handling
+      console.error(response.message, 'Error occured!')
+    }
+    if (response.status === 'success') {
+      // Error handling
+      console.log(response.message, 'Success!');
+      //window.location = '/dev/download/' + response.tmp + '/' + filename ;
+
+    }
+  })
+}
+
 $('#upload-input').on('change', function(){
   var files = $(this).get(0).files;
   var drive = $(this).closest('tr').children('.driveid').text();
@@ -37,7 +73,7 @@ $('#upload-input').on('change', function(){
           processData  : false,
           contentType  : false,
           success      : function (links) {
-
+            location.reload();
           }
       });
   }
@@ -112,7 +148,7 @@ function listFiles(driveID) {
         console.log('ye' + data.driveID);
         var currentDrive = data.driveID;
         table.append("<tr><td class='filenames'><strong>" + file.filename + "</strong></td><td>" + file.filename.split('.').pop() + "</td> " +
-          "<td class=\"text-right\"><button class='btn btn-success download text-white btn-sm' data-mime='" + file.filename.split('.').pop() + "' data-id='" + file.id + "' data-drive='" + data.driveID + "' data-filename='" + file.filename + "'> " +
+          "<td class=\"text-right\"><button class='btn btn-success download text-white btn-sm' data-mime='" + file.filename.split('.').pop() + "' data-id='" + file.id + "' data-drive='" + data.vaultID + "' data-filename='" + file.filename + "'> " +
           "<i class='fa fa-download' aria-hidden='true'></i></button> " +
           "<button class='btn btn-danger text-white btn-sm' onClick='deleteFile(this);' data-id='" + file.id + "' data-drive='" + data.driveID + "'> " +
           "<i class='fa fa-trash' aria-hidden='true'></i></button></td> " +

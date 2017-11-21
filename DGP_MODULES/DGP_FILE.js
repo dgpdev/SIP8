@@ -178,6 +178,89 @@ module.exports = {
         });
       });
     }
-  }
+  },
+  resolveFile: function(req, res, vaultID, cb) {
+    var randomFolder = DGPCRYPTO.genRandomString(24);
+    var tmpPath = DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder;
+    console.log(tmpPath);
+    if (!fs.existsSync(tmpPath)){
+          fs.mkdirSync(tmpPath);
+      }
+
+    var bucketId = req.body.driveID;
+    var fileId = req.body.fileID;
+    var downloadFilePath = tmpPath + '/' + req.body.fileNAME;
+
+    console.log('bucket: ' + bucketId);
+
+    console.log('init download' + downloadFilePath);
+
+    storj = new Environment({
+      bridgeUrl: DIGIPULSE_HUB,
+      bridgeUser: req.session.email,
+      bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+      encryptionKey: 'test1',
+      logLevel: 4
+    });
+
+    storj.resolveFile(bucketId, fileId, downloadFilePath, {
+      progressCallback: function(progress, downloadedBytes, totalBytes) {
+        console.log('Progress: %d, downloadedBytes: %d, totalBytes: %d',
+                    progress, downloadedBytes, totalBytes);
+      },
+      finishedCallback: function(err) {
+        if (err) {
+          return res.send({ status: 'fail', message: err.message });
+        }
+
+        //res.download(downloadFilePath);
+        //fsextra.removeSync(tmpPath);
+        return res.send({ status: 'success', message: 'download complete', tmp:randomFolder  });
+
+        //return res.send({ result: 'fileId' });
+        //storj.destroy();
+      }
+    });
+    /*
+    var bucketId = req.body.driveID;
+    var files = req.files;
+
+    if (files) {
+      files.forEach(function(file) {
+        console.log('-----------------------------------------');
+        console.log(file);
+        console.log('-----------------------------------------');
+
+        var uploadFilePath = file.path;
+        var fileName = file.filename;
+
+        storj = new Environment({
+          bridgeUrl: DIGIPULSE_HUB,
+          bridgeUser: req.session.email,
+          bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+          encryptionKey: 'test1',
+          logLevel: 4
+        });
+
+        storj.storeFile(bucketId, uploadFilePath, {
+          filename: fileName,
+          progressCallback: function(progress, uploadedBytes, totalBytes) {
+            console.log('Progress: %d, uploadedBytes: %d, totalBytes: %d',
+              progress, uploadedBytes, totalBytes);
+          },
+          finishedCallback: function(err, fileId) {
+            if (err) {
+              return res.send({status: 'fail',message: err.message});
+            }
+            // Remove file stored on system
+            fs.removeSync(file.destination );
+            return res.send({status: 'success',result: fileId});
+          }
+        });
+      });
+    }
+    */
+}
+
 
 }

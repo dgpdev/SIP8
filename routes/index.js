@@ -102,12 +102,16 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
  });
 
  router.post('/vault/upload', upload.any(), function(req, res, next) {
-   console.log(req.files);
-
    DGPFILE.storeFile(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
+ });
 
+ router.post('/vault/download/file', function(req, res, next) {
+   console.log("requested: " + req.body.driveID);
+   DGPFILE.resolveFile(req,res, req.body.vaultID, function(result){
+     return res.json(result);
+   });
  });
 
 
