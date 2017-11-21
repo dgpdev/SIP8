@@ -34,7 +34,7 @@ module.exports = {
       }
 
       return cb ({
-        status: 'successd',
+        status: 'success',
         result: result
       });
     });
@@ -68,7 +68,7 @@ deleteVault: function(req, res, vaultName, cb) {
         if (err) {
           return cb(err);
         }
-        return cb({result: result});
+        return cb({status: 'success', result: result});
       });
     },
 listFiles: function(req, res, vaultID, cb) {
