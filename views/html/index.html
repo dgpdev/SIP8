@@ -84,7 +84,10 @@
         if (buckets.status === 'fail') {
           alert('Some error happened');
         }
-        if (buckets.status === 'successd') {
+        if (buckets.status === 'empty') {
+          alert('Server error: ' + buckets.message);
+        }
+        if (buckets.status === 'success') {
           var table = $("#vaultTable");
           table.empty();
           table.append("<thead><tr><td>Vault name</td><td>Vault ID</td><td class=\"text-right\">Actions</td></tr>");
