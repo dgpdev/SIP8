@@ -43,8 +43,8 @@ var upload = multer({
  *                        @dev Uses the DGP_AUTH.js module                      *
  *******************************************************************************/
 
-router.get('/login/:user/:pass', function(req, res, next) {
-  var user = {email: req.params.user,password: req.params.pass};
+router.post('/login', function(req, res, next) {
+  var user = {email: req.body.user,password: req.body.pass};
   DGPAUTH.login(req,res, user, function(result){
     return res.json(result);
   });

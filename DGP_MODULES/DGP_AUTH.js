@@ -10,12 +10,14 @@ var client;
 var keypair;
 
 // SIP6
-const {Environment} = require('storj');
+const {
+  Environment
+} = require('storj');
 var storj;
 
 /**
  * Private
-**/
+ **/
 
 function storeSessionKey(req, key, user) {
   req.session.authed = true;
@@ -31,14 +33,19 @@ function storeSessionPassphrase(req, key, user) {
 
 /**
  * Public
-**/
+ **/
 
 module.exports = {
 
   login: function(req, res, userObject, cb) {
-    var user = {email: userObject.email ,password: userObject.password};
+    var user = {
+      email: userObject.email,
+      password: userObject.password
+    };
     console.log(user);
-    var client = storjlib.BridgeClient(DIGIPULSE_HUB, {basicAuth: user});
+    var client = storjlib.BridgeClient(DIGIPULSE_HUB, {
+      basicAuth: user
+    });
     var keypair = storjlib.KeyPair();
 
     client.addPublicKey(keypair.getPublicKey(), function(err) {
@@ -86,8 +93,12 @@ module.exports = {
   },
   authed: function(req, res, cb) {
     if (req.session && req.session.authed)
-      return cb({auth: true});
+      return cb({
+        auth: true
+      });
     else
-      return cb({auth: false});
+      return cb({
+        auth: false
+      });
   }
 }
