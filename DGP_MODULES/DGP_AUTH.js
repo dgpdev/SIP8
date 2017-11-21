@@ -12,7 +12,9 @@ var keypair;
 const {Environment} = require('storj');
 var storj;
 
-
+/**
+ * Private
+**/
 
 function storeSessionKey(req, key, user) {
   req.session.authed = true;
@@ -25,7 +27,9 @@ function storeSessionPassphrase(req, key, user) {
   req.session.passphrase = DGPCRYPTO.encrypt(SESSION_KEY, user.password);
 }
 
-
+/**
+ * Public
+**/
 
 module.exports = {
   login: function(req, res, userObject, cb) {
@@ -33,7 +37,6 @@ module.exports = {
     console.log(user);
     var client = storjlib.BridgeClient(DIGIPULSE_HUB, {basicAuth: user});
     var keypair = storjlib.KeyPair();
-
 
     client.addPublicKey(keypair.getPublicKey(), function(err) {
 
@@ -56,23 +59,18 @@ module.exports = {
 
       storj.getBuckets(function(err, result) {
         if (err) {
-          //req.session.destroy();
+          req.session.destroy();
           return cb({
             status: 'fail',
             message: 'Invalid password'
           });
         }
-        // UX return
-        //return res.render('index', {result: result});
-        // PLAIN TEST RETURN
+
         return cb({
           status: 'success',
           message: 'Login success'
         });
       });
-
-
     });
-
   }
 }
