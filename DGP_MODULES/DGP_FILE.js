@@ -42,6 +42,7 @@ module.exports = {
           message: 'No vaults found.'
         });
       }
+
       return cb ({
         status: 'success',
         result: result
