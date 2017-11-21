@@ -65,8 +65,9 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    });
  });
 
- router.get('/vault/:vaultID/list', function(req, res, next) {
-   DGPFILE.listFiles(req,res, req.params.vaultID, function(result){
+ router.post('/vault/list', function(req, res, next) {
+   console.log('param' + req.body.vaultID);
+   DGPFILE.listFiles(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
  });
@@ -91,7 +92,7 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
 
  /* GET home page. */
  router.get('/', auth, function(req, res, next) {
-   return res.render('index');
+   return res.render('index', {title: 'test'});
    res.json({status: "Success", message:"Frontpage", data:"none"});
  });
 
