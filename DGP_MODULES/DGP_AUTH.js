@@ -28,11 +28,13 @@ function storeSessionPassphrase(req, key, user) {
   req.session.passphrase = DGPCRYPTO.encrypt(SESSION_KEY, user.password);
 }
 
+
 /**
  * Public
 **/
 
 module.exports = {
+
   login: function(req, res, userObject, cb) {
     var user = {email: userObject.email ,password: userObject.password};
     console.log(user);
@@ -81,5 +83,11 @@ module.exports = {
         message: 'Logged out'
       });
     });
+  },
+  authed: function(req, res, cb) {
+    if (req.session && req.session.authed)
+      return cb({auth: true});
+    else
+      return cb({auth: false});
   }
 }
