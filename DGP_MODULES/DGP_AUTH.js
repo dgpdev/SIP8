@@ -1,10 +1,11 @@
 var session = require('express-session');
 var DGPCRYPTO = require("../DGP_MODULES/DGP_CRYPTO.js");
+var DGPCONFIG = require("../DGP_MODULES/DGP_CONFIG.js");
 
 // SIP5
 var storjlib = require('storj-lib');
-var DIGIPULSE_HUB = 'http://alpha.digipulse.io:8080';
-var SESSION_KEY = 'x6mJac43QZY93bCGu69XX9h8hFB2T5Z2pdpafrc52Gu7CfnQHPYE5KCY5acD4YB46SfCJSQK8699M8NtBbaFeCMp2gPMK2pWSUEZwxuTqYMwV34XE8fv9ar3tuBfz3QRr7vqAM8c6Fb72EheKR4UW5U79WMJ7d7RFjzFt9CcHkVnTZmBdJT7sEaexbMfqmzNcEvaxa9WBrZBBjn8UNe8Sd9sckEpccKjE4rZsUJSBnDnTnB8U5UquXMs7X7KkSbM'
+var DIGIPULSE_HUB = DGPCONFIG.bridgeUrl;
+var SESSION_KEY = DGPCONFIG.SessionKey;
 var client;
 var keypair;
 
@@ -81,5 +82,4 @@ module.exports = {
       });
     });
   }
-
 }
