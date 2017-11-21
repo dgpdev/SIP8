@@ -150,12 +150,39 @@ function listFiles(driveID) {
         table.append("<tr><td class='filenames'><strong>" + file.filename + "</strong></td><td>" + file.filename.split('.').pop() + "</td> " +
           "<td class=\"text-right\"><button class='btn btn-success download text-white btn-sm' data-mime='" + file.filename.split('.').pop() + "' data-id='" + file.id + "' data-drive='" + data.vaultID + "' data-filename='" + file.filename + "'> " +
           "<i class='fa fa-download' aria-hidden='true'></i></button> " +
-          "<button class='btn btn-danger text-white btn-sm' onClick='deleteFile(this);' data-id='" + file.id + "' data-drive='" + data.driveID + "'> " +
+          "<button class='btn btn-danger text-white btn-sm' onClick='deleteFile(this);' data-id='" + file.id + "' data-drive='" + data.vaultID + "'> " +
           "<i class='fa fa-trash' aria-hidden='true'></i></button></td> " +
           "</tr>");
         fileSize += file.size;
       });
       table.append("</tbody>");
+    }
+  })
+}
+
+
+function deleteFile(elem) {
+  var data = {};
+  data.vaultID = $(elem).attr('data-drive');
+  data.fileID = $(elem).attr('data-id')
+
+  $.ajax({
+    method: 'POST',
+    url: '/vault/file/delete',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    processData: false
+  }).done(function(response) {
+
+    if (response.status === 'fail') {
+      // Error handling
+      console.error(response.message, 'Error occured!')
+    }
+    if (response.status === 'success') {
+      // Error handling
+      console.log(response.message, 'Success!');
+      location.reload();
+
     }
   })
 }

@@ -221,46 +221,33 @@ module.exports = {
         //storj.destroy();
       }
     });
-    /*
-    var bucketId = req.body.driveID;
-    var files = req.files;
+  },
+  deleteFile: function(req, res, cb) {
 
-    if (files) {
-      files.forEach(function(file) {
-        console.log('-----------------------------------------');
-        console.log(file);
-        console.log('-----------------------------------------');
+    storj = new Environment({
+      bridgeUrl: DIGIPULSE_HUB,
+      bridgeUser: req.session.email,
+      bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+      encryptionKey: 'test1',
+      logLevel: 4
+    });
 
-        var uploadFilePath = file.path;
-        var fileName = file.filename;
+    console.log(req.body.vaultID);
+    console.log(req.body.fileID);
 
-        storj = new Environment({
-          bridgeUrl: DIGIPULSE_HUB,
-          bridgeUser: req.session.email,
-          bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
-          encryptionKey: 'test1',
-          logLevel: 4
+    storj.deleteFile(req.body.vaultID, req.body.fileID, function(err, result) {
+      if (err) {
+        return cb({
+          status: 'fail',
+          message: err.message
         });
-
-        storj.storeFile(bucketId, uploadFilePath, {
-          filename: fileName,
-          progressCallback: function(progress, uploadedBytes, totalBytes) {
-            console.log('Progress: %d, uploadedBytes: %d, totalBytes: %d',
-              progress, uploadedBytes, totalBytes);
-          },
-          finishedCallback: function(err, fileId) {
-            if (err) {
-              return res.send({status: 'fail',message: err.message});
-            }
-            // Remove file stored on system
-            fs.removeSync(file.destination );
-            return res.send({status: 'success',result: fileId});
-          }
-        });
+      }
+      return cb ({
+        status: 'success',
+        result: result
       });
-    }
-    */
-}
+    });
+  }
 
 
 }

@@ -10,13 +10,10 @@ var router = express.Router();
  /* Info only, these calls need binding.
 Nan::SetPrototypeMethod(constructor, "getInfo", GetInfo);
 
-
-Nan::SetPrototypeMethod(constructor, "storeFile", StoreFile);
 Nan::SetPrototypeMethod(constructor, "storeFileCancel", StoreFileCancel);
-Nan::SetPrototypeMethod(constructor, "resolveFile", ResolveFile);
 Nan::SetPrototypeMethod(constructor, "resolveFileCancel", ResolveFileCancel);
 Nan::SetPrototypeMethod(constructor, "deleteFile", DeleteFile);
-Nan::SetPrototypeMethod(constructor, "destroy", DestroyEnvironment);
+
 */
 
 
@@ -94,22 +91,23 @@ var DGPFILE = require("../DGP_MODULES/DGP_FILE.js");
    });
  });
 
-//  @Todo
- router.get('/vault/:vaultID/delete/:fileID', function(req, res, next) {
-   DGPAUTH.logout(req,res, function(result){
-     return res.json(result);
-   });
- });
 
  router.post('/vault/upload', upload.any(), function(req, res, next) {
    DGPFILE.storeFile(req,res, req.body.vaultID, function(result){
      return res.json(result);
    });
  });
-
+ 
  router.post('/vault/download/file', function(req, res, next) {
    console.log("requested: " + req.body.driveID);
    DGPFILE.resolveFile(req,res, req.body.vaultID, function(result){
+     return res.json(result);
+   });
+ });
+
+ router.post('/vault/file/delete', function(req, res, next) {
+   console.log("requested: " + req.body.vaultID);
+   DGPFILE.deleteFile(req,res, function(result){
      return res.json(result);
    });
  });
