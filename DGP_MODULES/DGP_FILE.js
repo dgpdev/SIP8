@@ -13,6 +13,9 @@ var keypair;
 const {Environment} = require('storj');
 var storj;
 
+function isEmpty(obj) {
+  return !Object.keys(obj).length > 0;
+}
 
 module.exports = {
   listVault: function(req, res, cb) {
@@ -33,6 +36,12 @@ module.exports = {
         });
       }
 
+      if(isEmpty(result)) {
+        return cb ({
+          status: 'empty',
+          message: 'No vaults found.'
+        });
+      }
       return cb ({
         status: 'success',
         result: result
