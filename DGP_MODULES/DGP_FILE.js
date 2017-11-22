@@ -43,6 +43,12 @@ var upload = multer({
   storage: storage
 });
 
+function makeDirs(tmpPath) {
+  if (!fs.existsSync(tmpPath)) {
+    fs.mkdirSync(tmpPath);
+  }
+}
+
 module.exports = {
   listVault: function(req, res, cb) {
 
@@ -190,10 +196,9 @@ module.exports = {
   resolveFile: function(req, res, vaultID, cb) {
     var randomFolder = DGPCRYPTO.genRandomString(24);
     var tmpPath = DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder;
-    console.log(tmpPath);
-    if (!fs.existsSync(tmpPath)) {
-      fs.mkdirSync(tmpPath);
-    }
+
+    makeDirs(DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir);
+    makeDirs(DGPCONFIG.uploadDirPath + DGPCONFIG.uploadTempDir + '/' + randomFolder);
 
     var bucketId = req.body.driveID;
     var fileId = req.body.fileID;

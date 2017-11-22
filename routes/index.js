@@ -7,6 +7,8 @@ var express = require('express');
 var fs = require('fs-extra');
 var router = express.Router();
 
+global.__basedir = __dirname;
+
 /* Include our modules */
 var DGPAUTH = require("../DGP_MODULES/DGP_AUTH.js");
 var DGPCONFIG = require("../DGP_MODULES/DGP_CONFIG.js");
