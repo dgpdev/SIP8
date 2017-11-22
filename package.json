@@ -19,6 +19,7 @@
     "is-empty": "1.2.0",
     "storj": "github:storj/node-libstorj",
     "storj-lib": "6.7.0",
-    "fs-extra": "4.0.2"
+    "fs-extra": "4.0.2",
+    "app-root-path": "2.0.1"
   }
 }
