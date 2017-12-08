@@ -36,7 +36,73 @@ function storeSessionPassphrase(req, key, user) {
  **/
 
 module.exports = {
+  register: function(req, res, userObject, cb) {
+    var client = storjlib.BridgeClient(DIGIPULSE_HUB);
+    var user = userObject.email;
+    var password = userObject.password;
 
+    client.createUser({
+      email: user,
+      password: password
+    }, function(err) {
+      if (err) {
+
+        return cb({
+          status: 'fail',
+          message: err.message
+        });
+      }
+
+      return cb({
+        status: 'success',
+        message: 'Account registered'
+      });
+    });
+  },
+  activate: function(req, res, userObject, cb) {
+    var user = {
+      email: userObject.email,
+      password: userObject.password
+    };
+
+    try {
+      var client = storjlib.BridgeClient(DIGIPULSE_HUB, {
+        basicAuth: user
+      });
+      var keypair = storjlib.KeyPair();
+    } catch (err) {
+      return cb({
+        status: 'fail',
+        message: err.message
+      });
+    }
+
+    client.addPublicKey(keypair.getPublicKey(), function(err) {
+
+      if (err) {
+        return cb({
+          status: 'fail',
+          message: err.message
+        });
+      }
+
+      storeSessionKey(req, keypair.getPrivateKey(), user);
+
+      storj = new Environment({
+        bridgeUrl: DIGIPULSE_HUB,
+        bridgeUser: req.session.email,
+        bridgePass: DGPCRYPTO.decrypt(SESSION_KEY, req.session.password),
+        encryptionKey: 'test',
+        logLevel: 4
+      });
+
+      return cb({
+        status: 'success',
+        message: 'Account activated'
+      });
+
+    });
+  },
   login: function(req, res, userObject, cb) {
     var user = {
       email: userObject.email,
